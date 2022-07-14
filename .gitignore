@@ -201,3 +201,6 @@ package-lock.json
 !.vscode/fix.cmd
 !.vscode/fix.reg
 
+data/quick_bans.txt
+data/quick_bans.csv
+
