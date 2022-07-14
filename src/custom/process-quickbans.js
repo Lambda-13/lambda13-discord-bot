@@ -76,23 +76,33 @@ function convert_raw_bans(bans_raw) {
  * 
  * @param {*} input - Any of banner: ckey, cid, ip
  */
-function get_banned(input) {
-    /* const allowed_input = ['ckey', 'cid', 'ip'];
-    if (!allowed_input.includes(input)) {
+function get_banned(bans, input) {
+    /* if (!allowed_input.includes(input)) {
         console.error('get_banned: no allowed input: "' + input + '"');
         return false;
     } */
-    let _data = [], _something_found = false;
-    for (let i = 0; i < cached_bans.length; i++) {
-        const ban_record = cached_bans[i];
+    const allowed_input = ['Ckey', 'Cid', 'ip'];
+    let _data = [], _something_found = false, _this_record_already_added = false;
+    console.log('get_banned: Searching for: "' + input + '", records to scan:', bans.ok.length);
+    for (let i = 0; i < bans.ok.length; i++) {
+        const ban_record = bans.ok[i];
+        _this_record_already_added = false;
         for (const [key, value] of Object.entries(ban_record)) {
-            if (value == input) {
+            if ((value == input) && (!_this_record_already_added)) {
+                console.log('Record №' + (i + 1) + ' — match found by', key);
                 _data.push(ban_record);
                 if (!_something_found) _something_found = true;
+                if (!_this_record_already_added) _this_record_already_added = true;
+            } else if ((_this_record_already_added) && (allowed_input.includes(key))) {
+                console.log('New match of this record by', key);
             }
         }
     }
-    return (_data.length == 0 ? false : _data)
+    if (_data.length == 0) {
+        console.error('get_banned: Cann\'t get anything with: "' + input + '"');
+        return false;
+    }
+    return _data;
 }
 
 
@@ -111,8 +121,11 @@ console.log('Total records:', cached_bans.ok.length + cached_bans.fail.length);
 console.log('Successfilly parsed records:', cached_bans.ok.length);
 console.log('Failed records:', cached_bans.fail.length);
 
-seached_banneds = get_banned('shalopay1');
-if (!seached_banneds) {console.log('None was found!'); return;}
-console.log('seached_banneds:', seached_banneds);
+seached_banneds = get_banned(cached_bans, 'shalopay');
+if (!seached_banneds) {console.log('None was found!');}
+console.log('seached_banneds:', seached_banneds || 'None');
+
+seached_banneds = get_banned(cached_bans, 'shalopay1');
+console.log('seached_banneds:', seached_banneds || 'None');
 
 return;
